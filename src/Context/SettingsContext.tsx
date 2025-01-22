@@ -199,13 +199,14 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     const removeData = async (id: number, resource: string): Promise<void> => {
         setIsLoading(true);
         setError(null);
+        console.log(storageRefreshedToken)
         try {
             await httpInterceptor(
                 'DELETE',
                 {},
                 { id: id },
                 `${process.env.NEXT_PUBLIC_API_URL}/${resource}`,
-                storageRefreshedToken || ''
+                storageRefreshedToken || ""
             );
             setData((prev) => prev.filter((item: Content) => item.id !== id));
             await fetchBranches()
