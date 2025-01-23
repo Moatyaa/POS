@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from "next/image";
 import plus from "../../../public/Icons/icon-plus.svg";
 import edit from "../../../public/Icons/edit.svg";
@@ -9,9 +9,7 @@ import { useSettings } from "@/Context/SettingsContext";
 import { Content } from "@/Types/categoriesTypes";
 import { Toaster } from "react-hot-toast";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Cookies from "js-cookie";
 import { TabResource } from "@/app/settings/[resource]/page";
-import useNetworkIP from "@/hooks/useLocalIP";
 
 interface DynamicContentProps {
     activeTab: TabResource;
@@ -21,7 +19,8 @@ interface DynamicContentProps {
 }
 
 const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, resource }) => {
-    const { data: contextData, removeData, last, isLoading, setsize, fetchData } = useSettings();
+    const { data: contextData, setData: setContextData, removeData, last, fetchData } = useSettings();
+    const [page, setPage] = useState<number>(0);
     const refreshToken = sessionStorage.getItem("refreshToken");
 
     const [modalState, setModalState] = useState({
@@ -32,7 +31,6 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
         currentItem: {} as Content,
         type: activeTab.name.toLowerCase(),
         resource: resource,
-
     });
 
     // Function to handle Edit modal
@@ -66,16 +64,30 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
         });
     };
 
-    // Fetch more data on scroll
     const fetchMoreData = async () => {
         if (!last && refreshToken) {
-            setsize(prev => prev + 5);
-            await fetchData(activeTab);  // Fetch new data for the next page
+            const scrollPosition = document.getElementById('scrollable-content')?.scrollTop;
+
+            setPage((prev) => prev + 1);
+
+            const newData = await fetchData(activeTab, page + 1);
+
+            if (newData && Array.isArray(newData)) {
+                setContextData((prevData) => [...prevData, ...newData]);
+
+                if (scrollPosition !== undefined) {
+                    document.getElementById('scrollable-content')?.scrollTo(0, scrollPosition);
+                }
+            }
+            console.log(newData);
         }
     };
 
+    useEffect(() => {
+        setContextData([])
+    }, [activeTab]);
 
-    // Function to render content based on the active tab
+
     const renderContent = (item: Content) => {
         switch (activeTab.name) {
             case 'Categories':
@@ -167,34 +179,17 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                     <Image src={plus} width={15} height={15} alt="Add" />
                 </div>
             </div>
-            <div className="operationBody">
+            <div className="operationBody" id="scrollable-content" style={{ height: '400px', overflowY: 'auto' }}>
                 <InfiniteScroll
-                    dataLength={contextData.length}  // Number of items loaded so far
-                    next={fetchMoreData}  // Fetch next data when scrolled to the bottom
-                    hasMore={!last}  // If there is more data to load
-                    loader={<p className='center'>{isLoading ? (
-                        <svg
-                            className="animate-spin h-8 w-8 text-[#2d71f8] text-2xl"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                        >
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4 12a8 8 0 0116 0"
-                            />
-                        </svg>
-                    ) : (
-                        ''
-                    )}</p>}
+                    dataLength={contextData.length}
+                    next={fetchMoreData}
+                    hasMore={!last}
+                    loader={<div className="loaderContainer"><p className="loaderText">جارٍ تحميل المزيد...</p></div>}  // loader يظهر أسفل المحتوى
                     endMessage={<div className="no-more-data"><p>✨ You’ve reached the end! ✨</p></div>}
-                    >
-                {contextData?.map((item) => (
+                    scrollableTarget="scrollable-content"
+                    scrollThreshold={0.9}  // تحميل البيانات عندما تصل إلى 90% من الصفحة
+                >
+                    {contextData?.map((item) => (
                         <div className="singleItem" key={item.id}>
                             {renderContent(item)}
                             <div className="operationIcons flex gap-2">

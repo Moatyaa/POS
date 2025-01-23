@@ -10,7 +10,7 @@ export type SettingContextTypes = {
     data: Content[];
     isLoading: boolean;
     error: string | null;
-    fetchData: (activeTab: TabResource) => void;
+    fetchData: (activeTab: TabResource , size: number) => void;
     fetchDataById: (activeTab: string, id:number) => void;
     addData: (item: Content, resource: string) => void;
     modifyData: (item: Content, resource: string) => void;
@@ -26,8 +26,6 @@ export type SettingContextTypes = {
     fetchBranches: () => void;
     setData: Dispatch<SetStateAction<Content[]>>;
     last: boolean,
-    size : number,
-    setsize: Dispatch<SetStateAction<number>>
 }
 
 const CategoryContext = createContext<SettingContextTypes | undefined>(undefined);
@@ -41,7 +39,7 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     const [roles, setRoles] = useState<any>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [size, setsize] = useState<number>(10);
+    // const [size, setsize] = useState<number>(10);
     const storageRefreshedToken = Cookies.get('refreshToken');
 
     const fetchCategories = async () => {
@@ -103,20 +101,29 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const fetchData = async (activeTab: TabResource) => {
-        setData([])
-        console.log(size)
+    const fetchData = async (activeTab: TabResource, page: number) => {
         if (!activeTab.resource) return;
         if (isLoading) return;
+
         setIsLoading(true);
         setError(null);
+
         try {
             if (!storageRefreshedToken) throw new Error('Refresh token is missing');
-            const response = await httpInterceptor('GET', {}, {}, `${process.env.NEXT_PUBLIC_API_URL}/${activeTab.resource}?size=${size}`, storageRefreshedToken);
-            setData(response.content);
-            setLast(response.last)
-            await fetchCategories()
-            await fetchCooperation()
+
+            const response = await httpInterceptor(
+                'GET',
+                {},
+                {},
+                `${process.env.NEXT_PUBLIC_API_URL}/${activeTab.resource}?page=${page}`,
+                storageRefreshedToken
+            );
+
+            setData((prev) => [...prev, ...response.content]);
+            setLast(response.last);
+            await fetchCategories();
+            await fetchCooperation();
+
         } catch (error) {
             console.error(`Failed to fetch data for ${activeTab.resource}`, error);
             setError('Failed to fetch data');
@@ -124,6 +131,7 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
             setIsLoading(false);
         }
     };
+
 
     const fetchDataById = async (activeTab: string, id:number) => {
         setData([])
@@ -267,8 +275,6 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
                 setData,
                 last,
                 setIsLoading,
-                size,
-                setsize,
                 branches,
                 fetchBranches,
                 roles

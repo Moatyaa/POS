@@ -5,7 +5,6 @@ import DynamicContent from '@/Components/Settings/settingsDynamicContent';
 import { resources } from "@/Constants/data";
 import SubLinksHeader from "@/Components/SubLinksHeader/SubLinksHeader";
 import clsx from "clsx";
-import Cookies from "js-cookie";
 import { useSettings } from "@/Context/SettingsContext";
 
 export type TabResource = {
@@ -28,7 +27,7 @@ const SettingsPage = () => {
 
     useEffect(() => {
         if (activeTab && refreshToken) {
-            fetchData(activeTab);
+            fetchData(activeTab , 0);
         }
     }, [activeTab, refreshToken]);
 
