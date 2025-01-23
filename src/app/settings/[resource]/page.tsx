@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import DynamicContent from '@/Components/Settings/settingsDynamicContent';
 import { resources } from "@/Constants/data";
