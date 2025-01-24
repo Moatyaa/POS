@@ -5,6 +5,7 @@ import { httpInterceptor } from '@/lib/utils';
 import { Content } from "@/Types/categoriesTypes";
 import { TabResource } from "@/app/settings/[resource]/page";
 import Cookies from "js-cookie";
+import {Branch} from "@/Types/modalType";
 
 export type SettingContextTypes = {
     data: Content[];
@@ -19,7 +20,7 @@ export type SettingContextTypes = {
     removeData: (id: number, resource: string) => void;
     categories: Content[];
     cooperation: Content[];
-    branches: any;
+    branches: Branch[];
     roles: Content[]
     fetchCategories: () => void;
     fetchCooperation: () => void;
@@ -37,7 +38,7 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     const [last, setLast] = useState<boolean>(false);
     const [categories, setCategories] = useState<Content[]>([]);
     const [cooperation, setCooperation] = useState<any>(null);
-    const [branches, setBranches] = useState<any>(null);
+    const [branches, setBranches] = useState<Branch[]>([]);
     const [roles, setRoles] = useState<any>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);

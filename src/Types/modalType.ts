@@ -57,8 +57,20 @@ export interface Branch {
     phone: string;
     cooperation_id: number;
     cooperation: Cooperation;
+    appUsers: User[]
 }
 
+export interface User {
+    id:number
+    name: string;
+    roles: Roles[];
+    email: string;
+}
+
+interface Roles {
+    name: string;
+    id: number;
+}
 // Item Type (Union of all the entity types)
 export type Item = Branch | Product | Supplier | Customer | Category;
 

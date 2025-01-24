@@ -1,11 +1,10 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input, Form, Select } from 'antd';
 import ModalSlider from './modalSlider';
 import CustomModal from '@/Components/CustomModal/CustomModal';
-import { categoriesImages, productImages } from "@/Constants/data";
-import { useSettings } from "@/Context/SettingsContext";
-import { Content } from "@/Types/categoriesTypes";
-
+import { categoriesImages, productImages } from '@/Constants/data';
+import { useSettings } from '@/Context/SettingsContext';
+import { Content } from '@/Types/categoriesTypes';
 
 type ModalState = {
     open: boolean;
@@ -15,12 +14,11 @@ type ModalState = {
     currentItem: Content;
     type: string | 'category' | 'product' | 'branches' | 'role' | 'supplier' | 'customer';
     resource: string;
-
 };
 
 export interface Field {
     label?: string;
-    key: string ;
+    key: string;
     type?: 'text' | 'number' | 'select' | 'email' | 'password';
     options?: { id: number; name: string }[];
     message?: string;
@@ -44,61 +42,40 @@ const AddModal: React.FC<EditModalProps> = ({
     const { addData, modifyData, categories, cooperation, branches, roles } = useSettings();
 
     useEffect(() => {
-        if (modalState.resource === 'Product') {
-            if (categories && categories.length > 0) {
-                setOptions(categories.map((category) => ({
-                    id: category.id,
-                    name: category.name,
-                })));
-            }
+        if (modalState.resource === 'Product' && categories?.length > 0) {
+            setOptions(categories.map((category) => ({ id: category.id, name: category.name })));
+        } else if (
+            (modalState.resource === 'Branch' || modalState.resource === 'Customer') &&
+            cooperation?.length > 0
+        ) {
+            setOptions(cooperation.map((cooperation) => ({ id: cooperation.id, name: cooperation.name })));
+        } else if (modalState.resource === 'Terminal' && branches?.length > 0) {
+            setOptions(branches.map((branch) => ({ id: branch.id, name: branch.name })));
+        } else if (modalState.resource === 'AppUser' && roles?.length > 0) {
+            setOptions(roles.map((role) => ({ id: role.id, name: role.name })));
         }
-        if (modalState.resource === 'Branch' || modalState.resource === "Customer") {
-            if (cooperation && cooperation.length > 0) {
-                setOptions(cooperation.map((cooperation) => ({
-                    id: cooperation.id,
-                    name: cooperation.name,
-                })));
-            }
-        }
-        if (modalState.resource === 'Terminal') {
-            if (branches && branches.length > 0) {
-                setOptions(branches.map((branch) => ({
-                    id: branch.id,
-                    name: branch.name,
-                })));
-            }
-        }
-        if (modalState.resource === 'AppUser') {
-            if (roles && roles.length > 0) {
-                setOptions(roles.map((role) => ({
-                    id: role.id,
-                    name: role.name,
-                })));
-            }
+    }, [categories, modalState.resource, cooperation, branches, roles]);
 
-        }
-    }, [categories, modalState.resource, cooperation]);
 
     useEffect(() => {
         setItem(modalState.currentItem);
     }, [modalState.currentItem]);
 
     useEffect(() => {
-        if (modalState.resource == "AppUser") {
-            console.log(modalState.currentId)
-            setItem((prev) => ({
-                ...prev,
-                branch_id: modalState?.currentId,
-            }));
+        setItem(modalState.currentItem);
+        if (modalState.resource === "AppUser") {
+            setItem((prev) => ({ ...prev, branch_id: modalState.currentId }));
         }
-
-    }, [modalState]);
+    }, [modalState])
 
     const closeModal = () => {
         setModalState((prevState) => ({ ...prevState, open: false }));
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, key: string) => {
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+        key: string
+    ) => {
         const { value } = e.target;
         if (modalState.mode === 'edit') {
             setModalState((prevState) => ({
@@ -116,52 +93,41 @@ const AddModal: React.FC<EditModalProps> = ({
         }
     };
 
-    const handleSelectChange = (value, key) => {
-        if (!item[key]) {
-            item[key] = Array.isArray(value) ? [] : {};
-        }
-        item[key] = value;
-        console.log('Updated item:', item);
+    const handleSelectChange = (value: any, key: string) => {
+        setItem((prevItem) => ({
+            ...prevItem,
+            [key]: value,
+        }));
     };
 
-
-    const add = async (item: Content) => {
-        if(modalState.resource == "AppUser"){
-            setItem((prev)=>({
-                ...prev ,
-                branch_id: modalState.currentId
-            }))
-        }
-
-         await addData(item, modalState.resource);
-         closeModal();
-
+    const add = async () => {
+        addData(item, modalState.resource);
+        closeModal();
     };
 
     const edit = async () => {
-        await modifyData(modalState.currentItem, modalState.resource);
+        modifyData(modalState.currentItem, modalState.resource);
         closeModal();
     };
 
     const renderFields = () => {
-        return fields?.map((field:Field) => {
-            if (field.type === 'select' && field.key !== undefined) {
+        return fields.map((field: Field) => {
+            if (field.type === 'select' && field.key) {
                 return (
                     <Form.Item key={field.key} label={field.label} rules={[{ required: true }]}>
                         <Select
                             mode={modalState.resource === 'AppUser' ? 'multiple' : undefined}
                             value={
                                 modalState.resource === 'AppUser'
-                                    ? item[field.key]?.map((obj) => obj.id) // إذا كانت متعددة
-                                    : item[field.key]
+                                    ? item[field.key]?.map((obj: any) => obj.id) || []
+                                    : item[field.key] ?? undefined
                             }
                             onChange={(selectedIds) => {
-                                if (modalState.resource === 'AppUser') {
-                                    const selectedObjects = selectedIds.map((id) => ({ id }));
-                                    handleSelectChange(selectedObjects, field.key);
-                                } else {
-                                    handleSelectChange(Number(selectedIds), field.key, options)
-                                }
+                                const value =
+                                    modalState.resource === 'AppUser'
+                                        ? selectedIds.map((id: number) => ({ id }))
+                                        : selectedIds;
+                                handleSelectChange(value, field.key);
                             }}
                         >
                             {options.length > 0 ? (
@@ -174,14 +140,16 @@ const AddModal: React.FC<EditModalProps> = ({
                                 <Select.Option disabled>No data available</Select.Option>
                             )}
                         </Select>
-
                     </Form.Item>
                 );
             }
 
             return (
-                <Form.Item labelCol={{ span: 6 }}
-                           wrapperCol={{ span: 18 }} key={field.key} label={field.label} rules={[{ required: true, message: field.message }]}>
+                <Form.Item
+                    key={field.key}
+                    label={field.label}
+                    rules={[{ required: true, message: field.message }]}
+                >
                     <Input
                         type={field.type}
                         value={item[field.key]}
@@ -191,6 +159,7 @@ const AddModal: React.FC<EditModalProps> = ({
             );
         });
     };
+
     return (
         <CustomModal
             modalOpen={modalState.open}
@@ -199,14 +168,16 @@ const AddModal: React.FC<EditModalProps> = ({
             content={
                 <div>
                     {(modalState.type === 'products' || modalState.type === 'categories') && (
-                        <ModalSlider images={modalState.type === 'products' ? productImages : categoriesImages} />
+                        <ModalSlider
+                            images={modalState.type === 'products' ? productImages : categoriesImages}
+                        />
                     )}
                     <Form>
                         {renderFields()}
                         <button
                             type="button"
                             className="modalBtn ant-btn"
-                            onClick={() => (modalState.mode === 'edit' ? edit() : add(item))}
+                            onClick={() => (modalState.mode === 'edit' ? edit() : add())}
                         >
                             <span>{modalState.mode === 'edit' ? 'Edit' : 'Add'}</span>
                         </button>

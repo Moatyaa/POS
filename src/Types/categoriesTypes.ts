@@ -43,8 +43,9 @@ export type Content = {
     image?: string;
     category: ModifyCatTypes;
     email? : string,
-    cooperation: ModifyCatTypes
-    identifier? : string
+    cooperation: ModifyCatTypes;
+    identifier? : string;
+    [key: string]: any
 };
 
 

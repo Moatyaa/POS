@@ -8,23 +8,22 @@ import {
 
 import Image from "next/image";
 import edit from "../../../public/Icons/edit.svg";
-import deletee from "../../../public/Icons/delete.svg";
 import {Content} from "@/Types/categoriesTypes";
 import EditModal, {Field} from "@/Components/Settings/EditModal";
 import plus from "../../../public/Icons/icon-plus.svg";
 import {useSettings} from "@/Context/SettingsContext";
 import {Toaster} from "react-hot-toast";
+import {Branch} from "@/Types/modalType";
 
 export interface User extends Content{
     id: number;
     name: string;
     email: string;
     role: string;
-    reatedAt: string; updatedAt: string; timestamp: string; description: string
 }
 function Team() {
 
-    const {branches , removeData} = useSettings()
+    const {branches} = useSettings()
     const [modalState, setModalState] = useState({
         open: false,
         mode: '' as 'add' | 'edit',
@@ -38,7 +37,6 @@ function Team() {
 
     // Function to handle Edit modal
     const handleEdit = (item: User) => {
-        console.log(item)
         setModalState({
             open: true,
             mode: 'edit',
@@ -47,11 +45,10 @@ function Team() {
             currentItem: item,
             resource: "AppUser",
             type: '',
-
         });
     };
 
-    const handleAdd = (branch: any) => {
+    const handleAdd = (branch:Branch) => {
         console.log(branch)
         setModalState({
             open: true,
@@ -88,10 +85,6 @@ function Team() {
         }
     ]
 
-    // Function to handle Delete
-    const handleDelete = (id: number) => {
-        removeData(id, 'AppUser')
-    };
     return (
         <section id="teamsBody" className="p-[20px]  rounded-lg ">
             <Toaster position="top-center" reverseOrder={false} />
@@ -115,7 +108,7 @@ function Team() {
                                         <th className="py-3 px-4 text-left font-semibold text-gray-700">Name</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-700">Email</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-700">Role</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Actions</th>
+                                        <th className="py-3 px-4 font-semibold text-gray-700 text-center">Actions</th>
                                         <th className="py-3 px-4 text-left font-semibold text-gray-700 cursor-pointer">
                                             <span className="plusIcon" onClick={()=>handleAdd(branch)}>
                                                 <Image src={plus} width={15} height={15} alt="Add"/>
@@ -134,15 +127,11 @@ function Team() {
                                                 </p>
                                             ))}</td>
                                             <td className="py-3">
-                                                <div className="operationIcons flex gap-2">
-                                                    <span className="plusIcon set_edit_icon group cursor-pointer"
+                                                <div className="operationIcons justify-center  flex gap-2">
+                                                    <span className="plusIcon set_edit_icon !bg-white group cursor-pointer"
                                                          onClick={() => handleEdit(user)}>
                                                         <Image src={edit} width={15} height={15} className="group-hover:scale-125"
                                                             alt="Edit Icon"/>
-                                                    </span>
-                                                    <span className="iconBg set_Del_icon group cursor-pointer"
-                                                          onClick={() => handleDelete(user.id)}>
-                                                        <Image src={deletee} alt="Delete Icon" className="group-hover:scale-125"/>
                                                     </span>
                                                 </div>
                                             </td>
