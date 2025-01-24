@@ -1,5 +1,4 @@
 import home from '../../public/Icons/home.svg'
-import activity from '../../public/Icons/activity.svg'
 import reports from '../../public/Icons/reports.svg'
 import inventory from '../../public/Icons/inventory.svg'
 import teams from '../../public/Icons/teams.svg'
@@ -29,57 +28,67 @@ export const sideBarLinks:SidebarLinks[] = [
         title: 'Point of Sale',
         route: '/',
         icon: home,
-    },
-    {
-        title: 'Activity',
-        route: '/activity',
-        icon: activity
+        role: 'User'
     },
     {
         title: 'Reports',
         route: '/reports',
-        icon: reports
+        icon: reports,
+        role: 'Admin'
     },
     {
         title: 'Inventory',
         route: '/inventory',
-        icon: inventory
+        icon: inventory,
+        role: 'User'
     },
     {
         title: 'Teams',
         route: '/teams',
         icon: teams,
+        role: 'Admin'
     },
     {
         title: 'Settings',
         route: `/settings`,
         icon: settings,
+        role: 'User',
         dropDownItems : [
             {
                 option: 'Categories',
                 route: '/category',
-                id: 12
+                id: 12,
+                role: 'User'
             },{
                 option: 'Products',
                 route: '/product',
-                id: 13
-
+                id: 13,
+                role: 'User'
             },{
                 option: 'Branches',
                 route: '/branch',
-                id: 15
+                id: 15,
+                role: 'Admin'
             },{
                 option: 'Cooperations',
                 route: '/cooperation',
-                id: 16
+                id: 16,
+                role: 'Admin'
             },{
                 option: 'Customers',
                 route: '/customer',
-                id: 18
+                id: 18,
+                role: 'User'
             },{
                 option: 'Suppliers',
                 route: '/supplier',
-                id: 17
+                id: 17,
+                role: 'Admin'
+            },{
+                option: 'Terminals',
+                route: '/terminal',
+                id: 20,
+                role: 'Admin'
             },
         ]
     },
@@ -98,6 +107,7 @@ export const resources = [
             },
         ],
         key: 2,
+        role: 'User'
     },
     {
         name: 'Products',
@@ -129,6 +139,7 @@ export const resources = [
             },
         ],
         key: 5,
+        role: 'User'
     },
     {
         name: 'Branches',
@@ -160,6 +171,7 @@ export const resources = [
             },
         ],
         key: 1,
+        role: 'Admin'
     },
     {
         name: 'Cooperations',
@@ -173,6 +185,7 @@ export const resources = [
             }
         ],
         key: 3,
+        role: 'Admin'
     },
     {
         name: 'Customers',
@@ -204,6 +217,7 @@ export const resources = [
             },
         ],
         key: 4,
+        role: 'User'
     },
     {
         name: 'Suppliers',
@@ -229,6 +243,7 @@ export const resources = [
             },
         ],
         key: 6,
+        role: 'Admin'
     },{
         name: 'Terminals',
         resource: 'Terminal',
@@ -253,6 +268,7 @@ export const resources = [
             },
         ],
         key: 7,
+        role: 'Admin'
     },
 ];
 
