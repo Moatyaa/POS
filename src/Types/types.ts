@@ -18,6 +18,7 @@ export type DropDownItem = {
     option: string;
     route: string;
     id: number;
+    role: 'Admin' | 'User' | 'Administrator';
 };
 
 // Define the SidebarLink structure.
@@ -25,6 +26,7 @@ export type SidebarLinks = {
     title: string;
     icon: string;
     route: string;
+    role : 'User' | 'Admin' | 'manager';
     dropDownItems?: DropDownItem[];  // Optional array of dropdown items.
 };
 

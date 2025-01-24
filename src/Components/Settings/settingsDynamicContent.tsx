@@ -9,9 +9,7 @@ import { useSettings } from "@/Context/SettingsContext";
 import { Content } from "@/Types/categoriesTypes";
 import { Toaster } from "react-hot-toast";
 import InfiniteScroll from "react-infinite-scroll-component";
-import Cookies from "js-cookie";
 import { TabResource } from "@/app/settings/[resource]/page";
-import useNetworkIP from "@/hooks/useLocalIP";
 
 interface DynamicContentProps {
     activeTab: TabResource;

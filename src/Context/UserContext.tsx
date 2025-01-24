@@ -45,6 +45,11 @@ export default function UserContextProvider({ children }: { children: ReactNode 
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'Strict',
                 });
+                Cookies.set('role', response.roles, {
+                    expires: 1,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'Strict',
+                });
                 router.push('/');
             } else {
                 setError('Invalid login response');
