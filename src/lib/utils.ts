@@ -1,28 +1,42 @@
-import { ProductType } from "@/Types/types";
 import React from "react";
 import clsx, {ClassValue} from "clsx";
 import {twMerge} from "tailwind-merge";
 import axios from "axios";
+import {Product} from "@/Types/productsTypes";
+import toast from "react-hot-toast";
 
-// Increment the count by 1 for a specific item in the cart
 export const incrementCartItem = (
     id: number,
-    cartProducts: ProductType[],
-    setCartProducts: React.Dispatch<React.SetStateAction<ProductType[]>>
+    cartProducts: Product[],
+    setCartProducts: React.Dispatch<React.SetStateAction<Product[]>>,
+    stockProducts: Product[]
 ) => {
-    // Update the quantity of the specific item in the cart
-    const updatedCart = cartProducts.map(item =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-    );
-    // Update the state with the new cart
-    setCartProducts(updatedCart);
+    const itemToUpdate = cartProducts.find(item => item.id === id);
+
+    if (itemToUpdate) {
+        const stockItem = stockProducts.find(item => item.id === id);
+
+        if (stockItem) {
+            const remainingStock = stockItem.stock - itemToUpdate.quantity;
+
+            if (remainingStock > 0) {
+                const updatedCart = cartProducts.map(item =>
+                    item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+                );
+                setCartProducts(updatedCart);
+            } else {
+                toast.error(`Cannot add more. 0 items left in stock.`);
+            }
+        }
+    }
 };
+
 
 // Decrement the count by 1, but prevent it from going below 1
 export const decrementCartItem = (
     id: number,
-    cartProducts: ProductType[],
-    setCartProducts: React.Dispatch<React.SetStateAction<ProductType[]>>
+    cartProducts: Product[],
+    setCartProducts: React.Dispatch<React.SetStateAction<Product[]>>
 ) => {
     // Only decrement the quantity if it's greater than 1
     const updatedCart = cartProducts.map(item =>
@@ -34,8 +48,8 @@ export const decrementCartItem = (
 
 // Delete an item from the cart by its ID
 export const deleteCartItem = (
-    cartItems: ProductType[],
-    id: number
+    id: number,
+    cartItems: Product[],
 ) => {
     // Filter out the item with the matching ID
     return cartItems.filter(item => item.id !== id);
@@ -57,55 +71,88 @@ export const handleInputNumberChange = (
 };
 
 // Format date and time (can be expanded based on your needs)
-export const formatDateTime = (dateString: Date) => {
+import Cookies from 'js-cookie';
+
+// تعريف نوع القيمة المرجعة من الدالة
+interface DateTimeFormate {
+    dateTime: string;
+    dateDay: string;
+    dateOnly: string;
+    timeOnly: string;
+}
+
+
+// تعريف نوع القيمة المرجعة من الدالة
+interface DateTimeFormate {
+    dateTime: string;
+    dateDay: string;
+    dateOnly: string;
+    timeOnly: string;
+}
+
+// الدالة الرئيسية لتنسيق التاريخ والوقت
+export const formatDateTime = (dateString: Date): DateTimeFormate => {
+    // تحديد اللغة تلقائيًا
+    const locale = Cookies.get("MYNEXTAPP_LOCALE") || navigator.language || 'en-US';
+    const isArabic = locale.startsWith('ar');
+
+    // تحديد نظام الترقيم بناءً على اللغة
+    const numberingSystem = isArabic ? 'arab' : 'latn';
+
     const dateTimeOptions: Intl.DateTimeFormatOptions = {
-        weekday: "short", // abbreviated weekday name (e.g., 'Mon')
-        month: "short", // abbreviated month name (e.g., 'Oct')
-        day: "numeric", // numeric day of the month (e.g., '25')
-        hour: "numeric", // numeric hour (e.g., '8')
-        minute: "numeric", // numeric minute (e.g., '30')
-        hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+        weekday: isArabic ? 'short' : 'short', // يوم الأسبوع (مختصر)
+        month: isArabic ? 'short' : 'short', // الشهر (مختصر)
+        day: 'numeric', // اليوم (رقم)
+        hour: 'numeric', // الساعة (رقم)
+        minute: 'numeric', // الدقيقة (رقم)
+        hour12: true, // استخدام نظام 12 ساعة
+        numberingSystem: numberingSystem, // تحديد نظام الترقيم
     };
 
     const dateDayOptions: Intl.DateTimeFormatOptions = {
-        weekday: "short", // abbreviated weekday name (e.g., 'Mon')
-        year: "numeric", // numeric year (e.g., '2023')
-        month: "2-digit", // abbreviated month name (e.g., 'Oct')
-        day: "2-digit", // numeric day of the month (e.g., '25')
+        weekday: 'short', // يوم الأسبوع (مختصر)
+        year: 'numeric', // السنة (رقم)
+        month: isArabic ? '2-digit' : 'short', // الشهر (مختصر أو رقمين)
+        day: 'numeric', // اليوم (رقمين)
+        numberingSystem: numberingSystem, // تحديد نظام الترقيم
     };
 
     const dateOptions: Intl.DateTimeFormatOptions = {
-        month: "short", // abbreviated month name (e.g., 'Oct')
-        year: "numeric", // numeric year (e.g., '2023')
-        day: "numeric", // numeric day of the month (e.g., '25')
+        month: isArabic ? 'short' : 'short', // الشهر (مختصر)
+        year: 'numeric', // السنة (رقم)
+        day: 'numeric', // اليوم (رقم)
+        numberingSystem: numberingSystem, // تحديد نظام الترقيم
     };
 
     const timeOptions: Intl.DateTimeFormatOptions = {
-        hour: "numeric", // numeric hour (e.g., '8')
-        minute: "numeric", // numeric minute (e.g., '30')
-        hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
+        hour: 'numeric', // الساعة (رقم)
+        minute: 'numeric', // الدقيقة (رقم)
+        hour12: true, // استخدام نظام 12 ساعة
+        numberingSystem: numberingSystem, // تحديد نظام الترقيم
     };
 
+    // تنسيق التاريخ والوقت
     const formattedDateTime: string = new Date(dateString).toLocaleString(
-        "en-US",
+        locale,
         dateTimeOptions
     );
 
     const formattedDateDay: string = new Date(dateString).toLocaleString(
-        "en-US",
+        locale,
         dateDayOptions
     );
 
     const formattedDate: string = new Date(dateString).toLocaleString(
-        "en-US",
+        locale,
         dateOptions
     );
 
     const formattedTime: string = new Date(dateString).toLocaleString(
-        "en-US",
+        locale,
         timeOptions
     );
 
+    // إرجاع القيم المنسقة
     return {
         dateTime: formattedDateTime,
         dateDay: formattedDateDay,
@@ -139,6 +186,7 @@ export const httpInterceptor = async (method: string, body:unknown  ,params: unk
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${accessToken.data.accessToken}`,
+
             },
         });
 

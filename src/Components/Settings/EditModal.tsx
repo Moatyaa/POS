@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Form, Select } from 'antd';
-import ModalSlider from './modalSlider';
 import CustomModal from '@/Components/CustomModal/CustomModal';
-import { categoriesImages, productImages } from '@/Constants/data';
 import { useSettings } from '@/Context/SettingsContext';
 import { Content } from '@/Types/categoriesTypes';
+import { useTranslations } from "use-intl";
+import Cookies from "js-cookie";
 
 type ModalState = {
     open: boolean;
@@ -19,7 +19,7 @@ type ModalState = {
 export interface Field {
     label?: string;
     key: string;
-    type?: 'text' | 'number' | 'select' | 'email' | 'password';
+    type?: 'text' | 'number' | 'select' | 'email' | 'password' | 'checkbox';
     options?: { id: number; name: string }[];
     message?: string;
 }
@@ -40,6 +40,33 @@ const AddModal: React.FC<EditModalProps> = ({
     const [item, setItem] = useState<Content>(modalState.currentItem);
     const [options, setOptions] = useState<{ id: number; name: string }[]>([]);
     const { addData, modifyData, categories, cooperation, branches, roles } = useSettings();
+    const t = useTranslations('SettingsModal');
+    const locale = Cookies.get('MYNEXTAPP_LOCALE');
+
+    useEffect(() => {
+        if (modalState.resource !== "Product") return;
+
+        setItem((prevItem) => {
+            const updatedItem = { ...modalState.currentItem };
+            let hasChanges = false;
+
+            fields.forEach((field) => {
+                if (field.type === "checkbox" && updatedItem[field.key] === undefined) {
+                    updatedItem[field.key] = false;
+                    hasChanges = true;
+                }
+            });
+
+            return hasChanges ? updatedItem : prevItem;
+        });
+    }, [modalState.currentItem, modalState.resource, fields]);
+
+    useEffect(() => {
+        setItem(modalState.currentItem);
+        if (modalState.resource === "AppUser") {
+            setItem((prev) => ({ ...prev, branch_id: modalState.currentId }));
+        }
+    }, [modalState.currentItem, modalState.resource, modalState.currentId]);
 
     useEffect(() => {
         if (modalState.resource === 'Product' && categories?.length > 0) {
@@ -56,18 +83,6 @@ const AddModal: React.FC<EditModalProps> = ({
         }
     }, [categories, modalState.resource, cooperation, branches, roles]);
 
-
-    useEffect(() => {
-        setItem(modalState.currentItem);
-    }, [modalState.currentItem]);
-
-    useEffect(() => {
-        setItem(modalState.currentItem);
-        if (modalState.resource === "AppUser") {
-            setItem((prev) => ({ ...prev, branch_id: modalState.currentId }));
-        }
-    }, [modalState])
-
     const closeModal = () => {
         setModalState((prevState) => ({ ...prevState, open: false }));
     };
@@ -76,21 +91,11 @@ const AddModal: React.FC<EditModalProps> = ({
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
         key: string
     ) => {
-        const { value } = e.target;
-        if (modalState.mode === 'edit') {
-            setModalState((prevState) => ({
-                ...prevState,
-                currentItem: {
-                    ...prevState.currentItem,
-                    [key]: value,
-                },
-            }));
-        } else {
-            setItem((prevItem) => ({
-                ...prevItem,
-                [key]: value,
-            }));
-        }
+        const { type, value, checked } = e.target as HTMLInputElement;
+        setItem((prevItem) => ({
+            ...prevItem,
+            [key]: type === "checkbox" ? checked : value,
+        }));
     };
 
     const handleSelectChange = (value: any, key: string) => {
@@ -106,7 +111,7 @@ const AddModal: React.FC<EditModalProps> = ({
     };
 
     const edit = async () => {
-        modifyData(modalState.currentItem, modalState.resource);
+        modifyData(item, modalState.resource);
         closeModal();
     };
 
@@ -114,7 +119,7 @@ const AddModal: React.FC<EditModalProps> = ({
         return fields.map((field: Field) => {
             if (field.type === 'select' && field.key) {
                 return (
-                    <Form.Item key={field.key} label={field.label} rules={[{ required: true }]}>
+                    <Form.Item key={field.key} label={t(field.label)} rules={[{ required: true }]}>
                         <Select
                             mode={modalState.resource === 'AppUser' ? 'multiple' : undefined}
                             value={
@@ -144,10 +149,22 @@ const AddModal: React.FC<EditModalProps> = ({
                 );
             }
 
+            if (field.type === 'checkbox') {
+                return (
+                    <Form.Item key={field.key} label={t(field.label)}>
+                        <Input
+                            type="checkbox"
+                            checked={item[field.key] ?? false}
+                            onChange={(e) => handleChange(e, field.key)}
+                        />
+                    </Form.Item>
+                );
+            }
+
             return (
                 <Form.Item
                     key={field.key}
-                    label={field.label}
+                    label={t(field.label)}
                     rules={[{ required: true, message: field.message }]}
                 >
                     <Input
@@ -164,16 +181,13 @@ const AddModal: React.FC<EditModalProps> = ({
         <CustomModal
             modalOpen={modalState.open}
             setModalOpen={closeModal}
-            title={`${modalState.mode === 'edit' ? 'Edit' : 'Add'} ${activeSubLinkTitle}`}
+            title={`${modalState.mode === 'edit' ? 'Edit' : t('Add')} ${activeSubLinkTitle}`}
             content={
                 <div>
-                    {(modalState.type === 'products' || modalState.type === 'categories') && (
-                        <ModalSlider
-                            images={modalState.type === 'products' ? productImages : categoriesImages}
-                        />
-                    )}
                     <Form>
-                        {renderFields()}
+                        <div className={locale ? locale === "ar" ? "arForm" : "enForm" : 'enForm'}>
+                            {renderFields()}
+                        </div>
                         <button
                             type="button"
                             className="modalBtn ant-btn"

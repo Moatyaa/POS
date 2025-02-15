@@ -1,15 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import Image from "next/image";
-import plus from "../../../public/Icons/icon-plus.svg";
-import edit from "../../../public/Icons/edit.svg";
-import deletee from "../../../public/Icons/delete.svg";
-import fixedImage from "../../../public/Icons/allMenu.svg";
-import EditModal from "@/Components/Settings/EditModal";
-import { useSettings } from "@/Context/SettingsContext";
-import { Content } from "@/Types/categoriesTypes";
-import { Toaster } from "react-hot-toast";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { TabResource } from "@/app/settings/[resource]/page";
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import plus from '../../../public/Icons/icon-plus.svg';
+import edit from '../../../public/Icons/edit.svg';
+import deletee from '../../../public/Icons/delete.svg';
+import upload from '../../../public/Icons/upload.png';
+import EditModal from '@/Components/Settings/EditModal';
+import { useSettings } from '@/Context/SettingsContext';
+import { Content } from '@/Types/categoriesTypes';
+import { Toaster } from 'react-hot-toast';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import ImageWithFallback from "@/Components/ui/ImageWithFallback";
+import {TabResource} from "@/app/settings/[resource]/page";
+import {useTranslations} from "use-intl";
 
 interface DynamicContentProps {
     activeTab: TabResource;
@@ -19,9 +21,19 @@ interface DynamicContentProps {
 }
 
 const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, resource }) => {
-    const { data: contextData, setData: setContextData, removeData, last, fetchData } = useSettings();
+    const {
+        data: contextData,
+        removeData,
+        last,
+        fetchData,
+        uploadImage,
+    } = useSettings();
     const [page, setPage] = useState<number>(0);
-    const refreshToken = sessionStorage.getItem("refreshToken");
+    const refreshToken = sessionStorage.getItem('refreshToken');
+    const t = useTranslations('resources')
+    const handleFileChange = (image: File, item: Content) => {
+        uploadImage(item, image, resource);
+    };
 
     const [modalState, setModalState] = useState({
         open: false,
@@ -33,7 +45,6 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
         resource: resource,
     });
 
-    // Function to handle Edit modal
     const handleEdit = (item: Content) => {
         setModalState({
             open: true,
@@ -46,12 +57,10 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
         });
     };
 
-    // Function to handle Delete
     const handleDelete = (id: number) => {
         removeData(id, resource);
     };
 
-    // Function to open Add modal
     const handleAdd = () => {
         setModalState({
             open: true,
@@ -65,28 +74,25 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
     };
 
     const fetchMoreData = async () => {
+        console.log(last)
+        console.log(refreshToken)
         if (!last && refreshToken) {
-            const scrollPosition = document.getElementById('scrollable-content')?.scrollTop;
-
             setPage((prev) => prev + 1);
-
-            const newData = await fetchData(activeTab, page + 1);
-
-            if (newData && Array.isArray(newData)) {
-                setContextData((prevData) => [...prevData, ...newData]);
-
-                if (scrollPosition !== undefined) {
-                    document.getElementById('scrollable-content')?.scrollTo(0, scrollPosition);
-                }
+            console.log("Fetching page:", page + 1);
+            try {
+                await fetchData(activeTab, page + 1);
+            } catch (error) {
+                console.error('Error fetching more data:', error);
             }
-            console.log(newData);
+        } else {
+            console.log("No more data to load.");
         }
     };
 
     useEffect(() => {
-        setContextData([])
-    }, [activeTab]);
-
+        setPage(0)
+        fetchData(activeTab, 1);
+    }, [activeTab.resource]);
 
     const renderContent = (item: Content) => {
         switch (activeTab.name) {
@@ -94,7 +100,7 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                 return (
                     <div className="flex items-center gap-4">
                         <div className="iconHolder">
-                            <Image src={fixedImage} alt={item.name} className="catIcon" width={30} height={30} />
+                            <ImageWithFallback id={item.id} resource={resource} />
                         </div>
                         <div className="catInfo !m-0">
                             <h3 className="catTitle">{item.name}</h3>
@@ -105,13 +111,13 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                 return (
                     <div className="flex gap-4">
                         <div className="iconHolder">
-                            <Image src={fixedImage} alt={item.name} className="catIcon" width={30} height={30} />
+                            <ImageWithFallback id={item.id} resource={resource} />
                         </div>
                         <div className="catInfo !m-0">
                             <h3 className="catTitle !font-bold">{item.name}</h3>
-                            <span>Price: <span className='text-[#696969]'> {item.salePrice}</span></span>
-                            <p>SKU: <span className='text-[#696969]'> {item.sku}</span></p>
-                            <p>Category: <span className='text-[#696969]'> {item.category?.name}</span></p>
+                            <span>{t('Price')}: <span className='text-[#696969]'>{item.salePrice}</span></span>
+                            <p>{t('SKU')}: <span className='text-[#696969]'> {item.sku}</span></p>
+                            <p>{t('Category')}: <span className='text-[#696969]'> {item.category?.name}</span></p>
                         </div>
                     </div>
                 );
@@ -120,9 +126,9 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                     <div className="flex items-center gap-4">
                         <div className="catInfo !m-0">
                             <h3 className="catTitle !font-bold">{item.name}</h3>
-                            <span>Phone: <span className='text-[#696969]'> {item.phone}</span></span>
-                            <p>Address: <span className='text-[#696969]'> {item.address}</span></p>
-                            <p>Cooperation: <span className="text-[#696969]">{item.cooperation?.name}</span></p>
+                            <span>{t('Phone')}: <span className='text-[#696969]'> {item.phone}</span></span>
+                            <p>{t('Address')}: <span className='text-[#696969]'> {item.address}</span></p>
+                            <p>{t('Cooperation')}: <span className="text-[#696969]">{item.cooperation?.name}</span></p>
                         </div>
                     </div>
                 );
@@ -139,8 +145,8 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                     <div className="flex items-center gap-4">
                         <div className="catInfo !m-0">
                             <h3 className="catTitle !font-bold">{item.name}</h3>
-                            <span>Contact: <span className='text-[#696969]'> {item.contact}</span></span>
-                            <p>Address: <span className='text-[#696969]'> {item.address}</span></p>
+                            <span>{t('Contact')}: <span className='text-[#696969]'> {item.contact}</span></span>
+                            <p>{t('Address')}: <span className='text-[#696969]'> {item.address}</span></p>
                         </div>
                     </div>
                 );
@@ -149,9 +155,9 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                     <div className="flex items-center gap-4">
                         <div className="catInfo !m-0">
                             <h3 className="catTitle !font-bold">{item.name}</h3>
-                            <p>Phone: <span className="text-[#696969]">{item.phone}</span></p>
-                            <p>Email: <span className="text-[#696969]">{item.email}</span></p>
-                            <p>Cooperation: <span className="text-[#696969]">{item.cooperation?.name}</span></p>
+                            <p>{t('Phone')}: <span className="text-[#696969]">{item.phone}</span></p>
+                            <p>{t('Email')}: <span className="text-[#696969]">{item.email}</span></p>
+                            <p>{t('Cooperation')}: <span className="text-[#696969]">{item.cooperation?.name}</span></p>
                         </div>
                     </div>
                 );
@@ -160,8 +166,8 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
                     <div className="flex items-center gap-4">
                         <div className="catInfo !m-0">
                             <h3 className="catTitle !font-bold">{item.name}</h3>
-                            <p>Terminal Identifier: <span className="text-[#696969]">{item.identifier}</span></p>
-                            <p>Branch: <span className="text-[#696969]">{item.branch?.name}</span></p>
+                            <p>{t('Terminal Identifier')}: <span className="text-[#696969]">{item.identifier}</span></p>
+                            <p>{t('Branch')}: <span className="text-[#696969]">{item.branch?.name}</span></p>
                         </div>
                     </div>
                 );
@@ -174,31 +180,42 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
         <div>
             <Toaster position="top-center" reverseOrder={false} />
             <div className="operationHeader" onClick={handleAdd}>
-                <h4>Add {activeTab.name}</h4>
+                <h4>{t("Add")} {t(activeTab.name)}</h4>
                 <div className="plusIcon">
                     <Image src={plus} width={15} height={15} alt="Add" />
                 </div>
             </div>
-            <div className="operationBody" id="scrollable-content" style={{ height: '400px', overflowY: 'auto' }}>
+            <div className="operationBody" id="scrollable-content" style={{ height: '80vh', overflowY: 'scroll' }}>
                 <InfiniteScroll
                     dataLength={contextData.length}
                     next={fetchMoreData}
                     hasMore={!last}
-                    loader={<div className="loaderContainer"><p className="loaderText">جارٍ تحميل المزيد...</p></div>}  // loader يظهر أسفل المحتوى
-                    endMessage={<div className="no-more-data"><p>✨ You’ve reached the end! ✨</p></div>}
+                    loader={<div className="loaderContainer py-4 text-center"><p className="text-gray-500">جارٍ تحميل المزيد...</p></div>}
+                    endMessage={<div className="no-more-data py-4 text-center"><p className="text-gray-500">✨{t("You Have Reached The End")}!✨</p></div>}
                     scrollableTarget="scrollable-content"
-                    scrollThreshold={0.9}  // تحميل البيانات عندما تصل إلى 90% من الصفحة
                 >
                     {contextData?.map((item) => (
-                        <div className="singleItem" key={item.id}>
+                        <div className="singleItem p-4 border-b border-gray-200" key={item.id}>
                             {renderContent(item)}
-                            <div className="operationIcons flex gap-2">
+                            <div className="operationIcons flex gap-2 mt-2">
                                 <span className="plusIcon set_edit_icon group cursor-pointer" onClick={() => handleEdit(item)}>
                                     <Image src={edit} width={15} height={15} className="group-hover:scale-125" alt="Edit Icon" />
                                 </span>
                                 <span className="iconBg set_Del_icon group cursor-pointer" onClick={() => handleDelete(item.id)}>
                                     <Image src={deletee} alt="Delete Icon" className="group-hover:scale-125" />
                                 </span>
+                                {activeTab.name === "Products" || activeTab.name === "Categories" ? (
+                                    <span className="iconBg set_Del_icon group cursor-pointer">
+                                        <label>
+                                            <input type="file" onChange={(event) => {
+                                                if (event.target.files) {
+                                                    handleFileChange(event.target.files[0], item);
+                                                }
+                                            }} hidden />
+                                            <Image src={upload} alt="Upload Icon" className="group-hover:scale-125" />
+                                        </label>
+                                    </span>
+                                ) : ''}
                             </div>
                         </div>
                     ))}
@@ -207,7 +224,7 @@ const DynamicContent: React.FC<DynamicContentProps> = ({ activeTab, fields, reso
             <EditModal
                 modalState={modalState}
                 setModalState={setModalState}
-                activeSubLinkTitle={activeTab.name}
+                activeSubLinkTitle={t(activeTab.name)}
                 fields={fields}
             />
         </div>

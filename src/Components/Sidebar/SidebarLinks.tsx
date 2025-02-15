@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation';
 import { sideBarLinks } from "@/Constants/data";
 import clsx from 'clsx';
 import Cookies from "js-cookie";
+import {useTranslations} from "use-intl";
 
 // eslint-disable-next-line react/display-name
 const SidebarLinks = React.memo(() => {
     const pathname = usePathname();
     const userRoles = Cookies.get("role")?.split(',') || [];  // Assuming roles are stored as a comma-separated string
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-
+    const t = useTranslations("sideBarLinks")
     const handleDropdownToggle = (route: string) => {
         setOpenDropdown((prev) => (prev === route ? null : route));
     };
@@ -42,7 +43,7 @@ const SidebarLinks = React.memo(() => {
                                 <span className="linkIconHolder">
                                     <Image src={link.icon} alt={link.title} className="linkIcon" />
                                 </span>
-                                <p className="linkTitle">{link.title}</p>
+                                <p className="linkTitle">{t(link.title)}</p>
                                 {hasSubLinks && (
                                     <span className="dropdownArrow">
                                         {openDropdown === link.route ? '▲' : '▼'}
@@ -60,7 +61,7 @@ const SidebarLinks = React.memo(() => {
                                             return (
                                                 <li key={idx}>
                                                     <Link href={`/settings/${item.route}`} className="dropdownItem">
-                                                        {item.option}
+                                                        {t(item.option)}
                                                     </Link>
                                                 </li>
                                             );

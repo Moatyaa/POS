@@ -4,6 +4,8 @@ import "../Styles/globals.css";
 import React from "react";
 import UserContextProvider from "@/Context/UserContext";
 import SettingContextProvider from "@/Context/SettingsContext";
+import {NextIntlClientProvider} from "next-intl";
+import {getLocale, getMessages} from "next-intl/server";
 
 const tajawal = Tajawal({
     weight: ["200", "300", "400", "500", "700", "800", "900"],
@@ -38,17 +40,21 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const messages = await getMessages()
+    const locale = await getLocale()
     return (
-        <html lang="en">
-        <body className={`${tajawal.variable} ${urbanist.variable}`}>
-        <div className='pos_container'>
-            <UserContextProvider>
-                <SettingContextProvider>
-                    {children}
-                </SettingContextProvider>;
-            </UserContextProvider>
-        </div>
+        <html lang={locale}>
+        <body className={`${tajawal.variable} ${urbanist.variable} h-[100vh]`}>
+        <NextIntlClientProvider messages={messages}>
+            <div className='pos_container'>
+                <UserContextProvider>
+                    <SettingContextProvider>
+                        {children}
+                    </SettingContextProvider>
+                </UserContextProvider>
+            </div>
+        </NextIntlClientProvider>
         </body>
         </html>
     );

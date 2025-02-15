@@ -1,0 +1,136 @@
+{
+  "sideBarLinks": {
+    "Point of Sale": "Point of Sale",
+    "Reports": "Reports",
+    "Inventory": "Inventory",
+    "Teams": "Teams",
+    "Settings": "Settings",
+    "Categories": "Categories",
+    "Financial": "Financial",
+    "Products": "Products",
+    "Branches": "Branches",
+    "Cooperations": "Cooperations",
+    "Customers": "Customers",
+    "Suppliers": "Suppliers",
+    "Terminals": "Terminals",
+    "Log Out" : "Log Out"
+
+  },
+  "resources": {
+    "Add": "Add",
+    "Settings": "Settings",
+    "Categories": "Categories",
+    "Products": "Products",
+    "Branches": "Branches",
+    "Cooperations": "Cooperations",
+    "Financial": "Financial",
+    "Inventory": "Inventory",
+    "Customers": "Customers",
+    "Suppliers": "Suppliers",
+    "Terminals": "Terminals",
+    "Name": "Name",
+    "Price": "Price",
+    "SKU": "SKU",
+    "Category": "Category",
+    "Address": "Address",
+    "Phone": "Phone",
+    "Email": "Email",
+    "Cooperation": "Cooperation",
+    "Contact": "Contact",
+    "Terminal Identifier": "Terminal Identifier",
+    "Branch": "Branch",
+    "You Have Reached The End": "You Have Reached The End"
+  },
+
+  "Inventory" : {
+    "Add Product to Stock": "Add Product to Stock",
+    "Stock Products": "Stock Products",
+    "Name": "Name",
+    "Stock": "Stock",
+    "Price": "Price"
+  },
+  "SettingsModal": {
+    "Add": "Add",
+    "Edit": "Edit",
+    "Categories": "Categories",
+    "Name": "Name",
+    "Please input the category name": "Please input the category name.",
+    "Products": "Products",
+    "Price": "Price",
+    "Please input a valid price": "Please input a valid price.",
+    "SKU": "SKU",
+    "Please input the SKU": "Please input the SKU.",
+    "Category": "Category",
+    "Services": "Services",
+    "Please select a category": "Please select a category.",
+    "Branches": "Branches",
+    "Address": "Address",
+    "Please input the branch address": "Please input the branch address.",
+    "Phone": "Phone",
+    "Please input a valid phone number": "Please input a valid phone number.",
+    "Cooperation": "Cooperation",
+    "Please select a cooperation": "Please select a cooperation.",
+    "Cooperations": "Cooperations",
+    "Customers": "Customers",
+    "Email": "Email",
+    "Please input a valid email address": "Please input a valid email address.",
+    "Suppliers": "Suppliers",
+    "Contact": "Contact",
+    "Please input the contact information": "Please input the contact information.",
+    "Terminals": "Terminals",
+    "Identifier": "Identifier",
+    "Please input the identifier information": "Please input the identifier information.",
+    "Branch": "Branch",
+    "Please input the Terminal Branch": "Please input the Terminal Branch.",
+    "User Name": "User Name",
+    "Password": "Password",
+    "Role": "Role",
+    "User": "User",
+    "Actions": "Actions",
+    "Cash Drop": "Cash Drop"
+  },
+  "Teams":{
+
+  },
+  "Cart": {
+    "roomLabel": "Room",
+    "orderLabel": "Order",
+    "orderNumber": "Order Number",
+    "editIconAlt": "Edit Icon",
+    "deleteIconAlt": "Delete Icon",
+    "decrementAriaLabel": "Decrease Quantity",
+    "incrementAriaLabel": "Increase Quantity",
+    "noItemsInCart": "No items in your cart",
+    "total": "Total",
+    "placeOrder": "Place Order",
+    "EGP": "EGP",
+    "Price": "Price",
+    "Quantity": "Quantity",
+    "Confirm Payment": "Confirm Payment",
+    "Total Price": "Total Price"
+  },
+  "Slider": {
+    "All Menu": "All Menu",
+    "Items": "Items"
+  },
+  "Shift": {
+    "Switch Shift": "Switch Shift",
+    "Switch Shift Confirmation": "Switch Shift Confirmation",
+    "Remaining Amount": "Remaining Amount",
+    "Your Shift Balance": "Your Shift Balance",
+    "Enter Your PIN": "Enter Your PIN",
+    "Cancel": "Cancel",
+    "Confirm": "Confirm"
+  },
+  "Financial": {
+    "Cashier": "Cashier",
+    "Select Cashier": "Select Cashier",
+    "Date": "Date",
+    "Amount": "Amount",
+    "Remaining Amount" : "Remaining Amount",
+    "No Cash Drops available": "No Cash Drops available"
+  }
+
+}
+
+

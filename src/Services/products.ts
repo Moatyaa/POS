@@ -9,7 +9,7 @@ const API_URL_Stock = `${process.env.NEXT_PUBLIC_API_URL}/ProductStock`;
 // Fetch all products
 export const getProducts = async (accessToken: string): Promise<Product[]> => {
     try {
-        return await httpInterceptor('GET', {}, {}, `${API_URL}`, accessToken);
+        return await httpInterceptor('GET', {}, {isPagable: false}, `${API_URL}`, accessToken);
     } catch (error) {
         throw handleError(error, 'An error occurred while fetching products');
     }

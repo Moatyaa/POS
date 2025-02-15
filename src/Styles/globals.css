@@ -14,9 +14,9 @@
 }
 
 body {
-    font-family: var(--font-urbanist), var(--font-tajwal) , sans-serif;
+    font-family:  var(--font-tajwal) ,var(--font-urbanist) , sans-serif;
     background-color: #fafafa;
-
+    height: 100vh !important;
 }
 
 .pos_container {
@@ -29,6 +29,13 @@ body {
     align-items: center;
 }
 
+body .ant-modal-content ,.dateTimeText, .ant-modal-title , .ant-col label , .linkTitle, .footerText{
+    font-family: var(--font-tajwal), serif !important;
+}
+.ant-modal-content {
+    direction: ltr !important;
+    z-index: 9999999;
+}
 .default-transition {
     @apply transition duration-300;
 }
@@ -139,6 +146,9 @@ body {
         @apply bg-white cursor-pointer w-[50px] h-[50px] rounded-full center;
     }
 
+    .rotate360{
+        transform: rotate(360deg);
+    }
     /*Date Time Section */
     #datetime  {
         @apply flex gap-2 items-center justify-between;
@@ -160,8 +170,12 @@ body {
     .shiftToggle {
         @apply flex justify-between items-center gap-4;
     }
+    .shiftModal {
+        direction: ltr !important;
+    }
     .pin {
         @apply text-center center mt-4 flex-col border-b pb-3 default-shadow;
+        direction: ltr !important;
     }
     .shiftModal_alert {
         @apply text-red-500 text-center mt-3;
@@ -170,8 +184,14 @@ body {
     .categoryCard {
         @apply  default-shadow p-[10px] rounded-lg bg-white cursor-pointer border border-transparent hover:border-[#2d71f8] hover:bg-[#f0f5ff];
     }
+    .categoryCard.active {
+        @apply border-[#2d71f8] bg-[#f0f5ff]
+    }
+    .categoryCard.active .iconHolder {
+        @apply bg-[#2D71F8]
+    }
     .iconHolder {
-        @apply w-[40px] h-[40px] center rounded-full bg-[#f9f9f9] group-hover:bg-[#2D71F8];
+        @apply w-[40px] h-[40px] center rounded-full overflow-hidden bg-[#f9f9f9] group-hover:bg-[#2D71F8];
     }
     .catIcon {
         @apply w-[20px] h-[20px];
@@ -190,6 +210,9 @@ body {
     .products {
         @apply mt-[15px] h-[65vh] overflow-auto;
     }
+    .outOfStockLayer {
+        @apply absolute w-[100%] h-[100%] z-[1] bg-[#fff5f580] top-0 left-0 rounded;
+    }
     .card {
         @apply bg-white p-[10px] rounded-[15px] flex flex-col gap-2;
     }
@@ -205,6 +228,9 @@ body {
     }
     .itemCategory {
         @apply bg-amber-400 text-amber-800 px-[5px] py-[2px] rounded-[20px] text-[11px];
+    }
+    .itemStock {
+        @apply bg-amber-200 text-amber-900 px-[5px] py-[2px] rounded-[20px] text-[11px];
     }
     .itemPrice {
         @apply font-medium text-[16px];
@@ -230,7 +256,7 @@ body {
         @apply text-[24px] w-[70%] text-center outline-0 bg-transparent;
     }
     .modalBtn {
-        @apply  w-[120%] text-white bg-[#2d71f8] relative top-[20px] h-[45px] left-[50%] -translate-x-[50%] outline-0;
+        @apply  w-[120%]  text-white bg-[#2d71f8] relative top-[20px] h-[45px] left-[50%] -translate-x-[50%] outline-0;
     }
     /*Cart*/
     .cart {
@@ -296,7 +322,7 @@ body {
     }
     /*Settings*/
     .settings {
-        @apply flex flex-col w-full p-[10px];
+        @apply flex flex-col w-full p-[10px] h-[100vh];
     }
     .subLink {
         @apply block bg-white rounded-xl mb-3 cursor-pointer p-[15px] hover:bg-[#f0f5ff] hover:text-[#2d71f8];
@@ -339,6 +365,13 @@ body {
 }
 .ant-modal-content {
     overflow: hidden;
+}
+.enForm {
+    direction: ltr !important;
+}
+
+.arForm {
+    direction: rtl !important;
 }
 
 .ant-modal-title {
@@ -481,7 +514,7 @@ body {
     transition: transform 0.3s ease-in-out;
 }
 .dropdownMenu {
-    padding-left: 20px;
+    padding: 0 20px;
     border-radius: 5px;
     max-height: 0;
     overflow: auto;
@@ -571,4 +604,27 @@ body {
         padding: 12px 18px;
         font-size: 16px;
     }
+}
+
+@media print {
+    body * {
+        visibility: hidden; /* إخفاء جميع العناصر */
+    }
+
+    #receipt,
+    #receipt * {
+        visibility: visible; /* عرض الإيصال فقط */
+    }
+
+    #receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm; /* عرض الورقة */
+        height: auto; /* طول محتوى الإيصال */
+    }
+}
+
+.hideCount {
+    visibility: hidden !important;
 }

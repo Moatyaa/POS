@@ -1,0 +1,135 @@
+{
+  "sideBarLinks": {
+    "Point of Sale": "نقطة البيع",
+    "Reports": "التقارير",
+    "Inventory": "المخزون",
+    "Teams": "الفرق",
+    "Settings": "الإعدادات",
+    "Financial": "الحسابات",
+    "Categories": "الفئات",
+    "Products": "المنتجات",
+    "Branches": "الفروع",
+    "Cooperations": "المؤسسات",
+    "Customers": "العملاء",
+    "Suppliers": "الموردين",
+    "Terminals": "الأجهزة الطرفية",
+    "Log Out" : "تسجيل خروج"
+  },
+
+  "Inventory" : {
+    "Add Product to Stock": "إضافه منتج الي المخزن",
+    "Stock Products": "المخزون",
+    "Name": "إسم المنتج",
+    "Stock": "العدد",
+    "Price": "السعر"
+  },
+
+  "SettingsModal": {
+    "Add" : "إضافة",
+    "Edit": "تعديل",
+    "Categories": "الفئات",
+    "Name": "الاسم",
+    "Please input the category name": "يرجى إدخال اسم الفئة.",
+    "Products": "المنتجات",
+    "Price": "السعر",
+    "Please input a valid price": "يرجى إدخال سعر صحيح.",
+    "SKU": "رمز SKU",
+    "Please input the SKU": "يرجى إدخال رمز SKU.",
+    "Category": "الفئة",
+    "Services": "خدمة",
+    "Please select a category": "يرجى اختيار فئة.",
+    "Branches": "الفروع",
+    "Address": "العنوان",
+    "Please input the branch address": "يرجى إدخال عنوان الفرع.",
+    "Phone": "الهاتف",
+    "Please input a valid phone number": "يرجى إدخال رقم هاتف صحيح.",
+    "Cooperation": "المؤسسة",
+    "Please select a cooperation": "يرجى اختيار تعاون.",
+    "Cooperations": "المؤسسات",
+    "Customers": "العملاء",
+    "Email": "البريد الإلكتروني",
+    "Please input a valid email address": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
+    "Suppliers": "الموردون",
+    "Contact": "جهة الاتصال",
+    "Please input the contact information": "يرجى إدخال معلومات الاتصال.",
+    "Terminals": "النقاط الطرفية",
+    "Identifier": "المعرف",
+    "Please input the identifier information": "يرجى إدخال معلومات المعرف.",
+    "Branch": "الفرع",
+    "Please input the Terminal Branch": "يرجى إدخال فرع النقطة الطرفية.",
+    "User Name": "إسم المستخدم",
+    "Password": "كلمة المرور",
+    "Role": "الدور",
+    "User": "المستخدم",
+    "Actions": "الإعدادات",
+    "Cash Drop": "أمر توريد"
+  },
+
+  "resources": {
+    "Add": "إضافة",
+    "Settings": "الإعدادات",
+    "Categories": "الفئات",
+    "Products": "المنتجات",
+    "Branches": "الفروع",
+    "Cooperations": "المؤسسات",
+    "Financial": "الحسابات",
+    "Customers": "العملاء",
+    "Suppliers": "الموردين",
+    "Terminals": "الأجهزة الطرفية",
+    "Inventory": "المخزن",
+    "Name": "الاسم",
+    "Price": "السعر",
+    "SKU": "SKU",
+    "Category": "الفئة",
+    "Address": "العنوان",
+    "Phone": "الهاتف",
+    "Email": "البريد الإلكتروني",
+    "Cooperation": "التعاون",
+    "Contact": "التواصل",
+    "Terminal Identifier": "المعرف",
+    "Branch": "الفرع",
+    "You Have Reached The End" : "لقد وصلت إلى النهاية"
+  },
+
+  "Cart": {
+    "roomLabel": "غرفة",
+    "orderLabel": "طلب",
+    "orderNumber": "رقم الطلب",
+    "editIconAlt": "أيقونة التعديل",
+    "deleteIconAlt": "أيقونة الحذف",
+    "decrementAriaLabel": "تقليل الكمية",
+    "incrementAriaLabel": "زيادة الكمية",
+    "noItemsInCart": "السلة فارغة أضف عناصر",
+    "total": "الإجمالي",
+    "placeOrder": "أكمل الطلب",
+    "EGP": "ج.م",
+    "Price": "السعر",
+    "Quantity": "الكمية",
+    "Confirm Payment": "تأكيد الدفع",
+    "Total Price": "إجمالي السعر"
+  },
+  "Header" : {
+    "currency": "ج.م"
+  },
+  "Slider": {
+    "All Menu": "جميع المنتجات",
+    "Items": "منتج"
+  },
+  "Shift": {
+    "Switch Shift": "تبديل الشيفت",
+    "Switch Shift Confirmation" : "تأكيد تبديل الشيفت",
+    "Remaining Amount" : "المبلغ المتبقي",
+    "Your Shift Balance": "رصيدك الحالي",
+    "Enter Your PIN": "أدخل رمز المرور الخاص بك"
+
+  },
+  "Financial": {
+    "Cashier": "إسم الكاشير",
+    "Select Cashier": "إختر الكاشير",
+    "Amount": "المبلغ المورد",
+    "Date": "تاريخ التوريد",
+    "Remaining Amount" : "المبلغ المتبقي",
+    "No Cash Drops available": "لا يوجد عمليات توريد مسبقة"
+  }
+}
+

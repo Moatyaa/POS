@@ -1,32 +1,43 @@
 'use client'
 import toast from "react-hot-toast";
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
-import { httpInterceptor } from '@/lib/utils';
+import React, { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
+import { httpInterceptor} from '@/lib/utils';
 import { Content } from "@/Types/categoriesTypes";
 import { TabResource } from "@/app/settings/[resource]/page";
 import Cookies from "js-cookie";
-import {Branch} from "@/Types/modalType";
-
+import {Branch, Category} from "@/Types/modalType";
+import axios from "axios";
+import noImage from '../../public/Icons/no-image.png'
+import {Product} from "@/Types/productsTypes";
 export type SettingContextTypes = {
     data: Content[];
     isLoading: boolean;
     error: string | null;
     fetchData: (activeTab: TabResource , size: number) => void;
-    fetchDataById: (activeTab: string, id:number) => void;
+    fetchDataById: (activeTab: string) => Product;
     addData: (item: Content, resource: string) => void;
     modifyData: (item: Content, resource: string) => void;
     setError: Dispatch<SetStateAction<string | null>>;
+    setLast: Dispatch<SetStateAction<boolean>>;
     setIsLoading: Dispatch<SetStateAction<boolean>>;
+    setStockProducts: Dispatch<SetStateAction<Product[]>>;
+    fetchStockProducts:() => void;
+    stockProducts: Product[];
     removeData: (id: number, resource: string) => void;
-    categories: Content[];
+    categories: Category[];
     cooperation: Content[];
+    shift: Content | undefined ;
     branches: Branch[];
     roles: Content[]
     fetchCategories: () => void;
     fetchCooperation: () => void;
     fetchBranches: () => void;
+    fetchCurrentShift:  () => void;
+    uploadImage:  (item:Content, image:File, resource: string) => void;
     setData: Dispatch<SetStateAction<Content[]>>;
     last: boolean,
+    handleError: (e: React.SyntheticEvent<HTMLImageElement, Event>) => void
+    locale: string
 }
 
 const CategoryContext = createContext<SettingContextTypes | undefined>(undefined);
@@ -34,12 +45,16 @@ const CategoryContext = createContext<SettingContextTypes | undefined>(undefined
 const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     const [data, setData] = useState<Content[]>([]);
     const [last, setLast] = useState<boolean>(false);
-    const [categories, setCategories] = useState<Content[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [shift, setShift] = useState<Content>();
     const [cooperation, setCooperation] = useState<any>(null);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [roles, setRoles] = useState<any>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [stockProducts, setStockProducts] = useState<any[]>([]);
+    const [locale, setLocale] = useState<string>("ar");
+
     // const [size, setsize] = useState<number>(10);
     const storageRefreshedToken = Cookies.get('refreshToken');
 
@@ -48,8 +63,52 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
         setError(null);
         try {
             if (!storageRefreshedToken) throw new Error('Refresh token is missing');
-            const response = await httpInterceptor('GET', null, {}, `${process.env.NEXT_PUBLIC_API_URL}/Category`, storageRefreshedToken);
+            const response = await httpInterceptor('GET', {} , {isPagable: false}, `${process.env.NEXT_PUBLIC_API_URL}/Category`, storageRefreshedToken);
+            await Promise.all(response.content.map(async (category:Category) => await fetchCategoryProductCount(category)))
             setCategories(response.content);
+        } catch (error) {
+            console.error('Failed to fetch categories', error);
+            setError('Failed to fetch categories');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const fetchCategoryProductCount = async (category:Category) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            if (!storageRefreshedToken) throw new Error('Refresh token is missing');
+            const response = await httpInterceptor('GET', {} , {isPagable: false}, `${process.env.NEXT_PUBLIC_API_URL}/ProductStock/GetCountByCategoryId/${category.id}`, storageRefreshedToken);
+            category.numberOfProductsStock = response;
+        } catch (error) {
+            console.error('Failed to fetch categories', error);
+            setError('Failed to fetch categories');
+        } finally {
+            setIsLoading(false);
+        }
+        return category;
+    };
+
+    const fetchStockProducts = async () => {
+        setStockProducts([])
+        setIsLoading(true);
+        setError(null);
+        try {
+            const fetchedProducts:any =  await httpInterceptor('GET', {}, {isPagable: false}, `${process.env.NEXT_PUBLIC_API_URL}/ProductStock`, storageRefreshedToken ? storageRefreshedToken :'');
+            setStockProducts(fetchedProducts.content)
+            return fetchedProducts.content
+        } catch {
+             setError('An error occurred while fetching products');
+        }
+    };
+
+    const fetchCurrentShift = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            if (!storageRefreshedToken) throw new Error('Refresh token is missing');
+            const response = await httpInterceptor('GET', {} , {}, `${process.env.NEXT_PUBLIC_API_URL}/Shift/ActiveShift`, storageRefreshedToken);
+            setShift(response);
         } catch (error) {
             console.error('Failed to fetch categories', error);
             setError('Failed to fetch categories');
@@ -65,7 +124,7 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
             if (!storageRefreshedToken) throw new Error('Refresh token is missing');
             const response = await httpInterceptor('GET', null, {}, `${process.env.NEXT_PUBLIC_API_URL}/Cooperation`, storageRefreshedToken);
             setCooperation(response.content);
-        } catch (error) {
+        } catch (err) {
             setError('Failed to fetch cooperation');
         } finally {
             setIsLoading(false);
@@ -103,25 +162,34 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const fetchData = async (activeTab: TabResource, page: number) => {
-        if (!activeTab.resource) return;
-        if (isLoading) return;
-
         setIsLoading(true);
         setError(null);
 
         try {
             if (!storageRefreshedToken) throw new Error('Refresh token is missing');
 
+
             const response = await httpInterceptor(
                 'GET',
                 {},
-                {},
-                `${process.env.NEXT_PUBLIC_API_URL}/${activeTab.resource}?page=${page}`,
+                {page: page},
+                `${process.env.NEXT_PUBLIC_API_URL}/${activeTab.resource}?size=10`,
                 storageRefreshedToken
             );
 
-            setData((prev) => [...prev, ...response.content]);
+
+            if (page === 0) {
+                setData(response.content);
+            } else {
+                setData((prev) => {
+                    const existingIds = prev.map((item: Content) => item.id);
+                    const newItems = response.content.filter((item: Content) => !existingIds.includes(item.id));
+                    return [...prev, ...newItems];
+                });
+            }
+
             setLast(response.last);
+
             await fetchCategories();
             await fetchCooperation();
 
@@ -134,7 +202,11 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     };
 
 
-    const fetchDataById = async (activeTab: string, id:number) => {
+    const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        e.currentTarget.setAttribute('src' , `${noImage.src}`);
+    };
+
+    const fetchDataById = async (activeTab: string) => {
         setData([])
         if (!activeTab) return;
         if (isLoading) return;
@@ -142,7 +214,7 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
         setError(null);
         try {
             if (!storageRefreshedToken) throw new Error('Refresh token is missing');
-            return await httpInterceptor('GET', {id: id}, {}, `${process.env.NEXT_PUBLIC_API_URL}/${activeTab}`, storageRefreshedToken);
+            return await httpInterceptor('GET',{}, {}, `${process.env.NEXT_PUBLIC_API_URL}/${activeTab}`, storageRefreshedToken);
         } catch (error) {
             console.error(`Failed to fetch data for ${activeTab}`, error);
             setError('Failed to fetch data');
@@ -173,8 +245,34 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const uploadImage = async (item: Content, image: File, resource: string): Promise<void> => {
+        setIsLoading(true);
+        setError(null);
+        const formData = new FormData();
+        formData.append('file', image);
+        try {
+            const accessTokenResponse = await axios.post(`http://localhost:9090/auth/refresh-token?refreshToken=${storageRefreshedToken}`);
+            const accessToken = accessTokenResponse.data.accessToken;
+
+            const response = await axios({
+                method: 'POST',
+                url: `${process.env.NEXT_PUBLIC_API_URL}/${resource}/UploadImage/${item.id}`,
+                data: formData,
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+            toast.success('تم رفع الصورة بنجاح')
+            window.location.reload();
+            return response.data;
+        } catch (error) {
+            console.error('API call failed:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    };
     const modifyData = async (item: Content, resource: string): Promise<void> => {
-        console.log(item)
         setIsLoading(true);
         setError(null);
         try {
@@ -208,7 +306,6 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     const removeData = async (id: number, resource: string): Promise<void> => {
         setIsLoading(true);
         setError(null);
-        console.log(storageRefreshedToken)
         try {
             await httpInterceptor(
                 'DELETE',
@@ -248,13 +345,17 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
     };
 
 
-
     useEffect(() => {
-        setData([])
-        fetchRoles()
-        fetchBranches()
-        fetchCategories();
-        fetchCooperation();
+        if(storageRefreshedToken) {
+            setData([])
+            fetchRoles()
+            fetchBranches()
+            fetchCategories();
+            fetchCooperation();
+            fetchCurrentShift();
+            const locale = Cookies.get('MYNEXTAPP_LOCALE') || 'ar';
+            setLocale(locale);
+        }
     }, []);
 
     return (
@@ -273,12 +374,21 @@ const SettingContextProvider = ({ children }: { children: ReactNode }) => {
                 fetchCategories,
                 fetchCooperation,
                 fetchDataById,
+                fetchCurrentShift,
+                shift,
                 setData,
                 last,
                 setIsLoading,
                 branches,
                 fetchBranches,
-                roles
+                uploadImage,
+                roles,
+                setLast,
+                handleError,
+                stockProducts,
+                fetchStockProducts,
+                setStockProducts,
+                locale
             }}
         >
             {children}

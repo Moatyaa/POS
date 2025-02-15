@@ -14,6 +14,9 @@ export default {
 				"20%,50%": { opacity: "0" },
 			},
 		},
+		transform: {
+			'rotate-y-180': 'rotateY(180deg)',
+		},
 		animation: {
 			"caret-blink": "caret-blink 1.25s ease-out infinite",
 		},

@@ -14,6 +14,8 @@ import plus from "../../../public/Icons/icon-plus.svg";
 import {useSettings} from "@/Context/SettingsContext";
 import {Toaster} from "react-hot-toast";
 import {Branch} from "@/Types/modalType";
+import {useTranslations} from "use-intl";
+import Cookies from "js-cookie";
 
 export interface User extends Content{
     id: number;
@@ -22,7 +24,7 @@ export interface User extends Content{
     role: string;
 }
 function Team() {
-
+    const t= useTranslations('SettingsModal')
     const {branches} = useSettings()
     const [modalState, setModalState] = useState({
         open: false,
@@ -34,6 +36,7 @@ function Team() {
         type: '',
 
     });
+    const locals = Cookies.get('MYNEXTAPP_LOCALE')
 
     // Function to handle Edit modal
     const handleEdit = (item: User) => {
@@ -49,7 +52,6 @@ function Team() {
     };
 
     const handleAdd = (branch:Branch) => {
-        console.log(branch)
         setModalState({
             open: true,
             mode: 'add',
@@ -74,11 +76,11 @@ function Team() {
             message: 'Please input the User Email.',
         },{
             label: 'Password',
-            key: 'password',
+            key: 'passwordJson',
             type: 'password',
             message: 'Please input the password.',
         },{
-            label: 'Role ',
+            label: 'Role',
             key: 'roles',
             type: 'select',
             message: 'Please input the User Role',
@@ -102,14 +104,14 @@ function Team() {
                         <AccordionContent className="text-gray-600 p-4 bg-gray-50 rounded-b-lg">
                         {/* User Table */}
                             <div className="overflow-x-auto">
-                                <table className="min-w-full table-auto border-collapse">
+                                <table className="min-w-full table-auto border-collapse" dir={locals=='ar' ? "rtl" : "ltr"}>
                                     <thead>
-                                    <tr>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Name</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Email</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-700">Role</th>
-                                        <th className="py-3 px-4 font-semibold text-gray-700 text-center">Actions</th>
-                                        <th className="py-3 px-4 text-left font-semibold text-gray-700 cursor-pointer">
+                                    <tr className='text-justify'>
+                                        <th className="py-3 px-4   font-semibold text-gray-700">{t("Name")}</th>
+                                        <th className="py-3 px-4  font-semibold text-gray-700">{t("Email")}</th>
+                                        <th className="py-3 px-4  font-semibold text-gray-700">{t("Role")}</th>
+                                        <th className="py-3 px-4 font-semibold text-gray-700 text-center" >{t("Actions")}</th>
+                                        <th className="py-3 px-4  font-semibold text-gray-700 cursor-pointer">
                                             <span className="plusIcon" onClick={()=>handleAdd(branch)}>
                                                 <Image src={plus} width={15} height={15} alt="Add"/>
                                             </span>
@@ -143,7 +145,7 @@ function Team() {
                                 <EditModal
                                     modalState={modalState}
                                     setModalState={setModalState}
-                                    activeSubLinkTitle={'User'}
+                                    activeSubLinkTitle={t('User')}
                                     fields={fields}
                                 />
                             </div>

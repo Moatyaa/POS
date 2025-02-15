@@ -35,7 +35,7 @@ export default function UserContextProvider({ children }: { children: ReactNode 
         setError(null);
         try {
             const response = await userLogin(loginData);
-            sessionStorage.setItem('userData', JSON.stringify(response.roles));
+            sessionStorage.setItem('userData', JSON.stringify(response));
             sessionStorage.setItem('branchId', JSON.stringify(response.branch_id));
             if (response?.refreshToken) {
                 setSharedRefreshToken(response.refreshToken);

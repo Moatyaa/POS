@@ -5,11 +5,13 @@ import dateIcon from "../../../public/Icons/date.svg";
 import {dateTimeFormate, SubLinksHeaderProps} from "@/Types/types";
 import { formatDateTime } from "@/lib/utils";
 import ShiftToggle from "@/Components/ShiftToggle/ShiftToogle";
+import LanguageToggle from "@/Components/ui/LangToggle";
+import {useTranslations} from "use-intl";
 
 
 function SubLinksHeader({ subHeaderTitle, activeSubLinkTitle }: SubLinksHeaderProps) {
     const date: dateTimeFormate = formatDateTime(new Date());
-
+    const t = useTranslations('resources')
     return (
         <section id='subLinksHeader' className='w-[100%] p-[10px]'>
             <div className='flex justify-between items-center w-[100%]'>
@@ -18,7 +20,7 @@ function SubLinksHeader({ subHeaderTitle, activeSubLinkTitle }: SubLinksHeaderPr
                     <span className='path'>
                         {subHeaderTitle}
                         {activeSubLinkTitle && (
-                            <span className='text-[14px] text-[#b6b6b6]'> / {activeSubLinkTitle}</span>
+                            <span className='text-[14px] text-[#b6b6b6]'> / {t(activeSubLinkTitle)}</span>
                         )}
                     </span>
 
@@ -28,9 +30,13 @@ function SubLinksHeader({ subHeaderTitle, activeSubLinkTitle }: SubLinksHeaderPr
                         <span className='dateTimeIcon'>
                             <Image src={dateIcon} alt='Date icon' />
                         </span>
-                        <span className='dateTimeText'>{date.dateDay.split(',')[0]}, {date.dateOnly}</span>
+                        <span className='dateTimeText'>{date.dateOnly}</span>
                     </span>
-                    <ShiftToggle />
+                    <div>
+                        <ShiftToggle />
+                        <LanguageToggle />
+                    </div>
+
                 </div>
             </div>
         </section>

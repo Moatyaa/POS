@@ -1,19 +1,20 @@
 'use client';
-import React, {FormEvent, ChangeEvent, useEffect} from 'react';
+import React, {FormEvent, ChangeEvent, useEffect, useState} from 'react';
 import loginImage from '../../../public/Images/login-hero.png';
 import Image from "next/image";
 import { useUser } from "@/Context/UserContext";
-import useNetworkIP from "@/hooks/useLocalIP";
 
 const Login: React.FC = () => {
     const { login, loginData, setLoginData, loading, error } = useUser();
-    const networkIp =  useNetworkIP()
+    const [uId , setUId] = useState<string>()
 
     useEffect(() => {
-        if(networkIp){
-            setLoginData({ login: '', password: '' ,terminalIdentifier: networkIp});
+        if(uId){
+            console.log('uId', uId)
+            setLoginData({ login: '', password: '' ,terminalIdentifier: uId});
         }
-    }, [networkIp]);
+
+    }, [uId]);
 
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,6 +29,13 @@ const Login: React.FC = () => {
         e.preventDefault();
         login()
     };
+
+    useEffect(() => {
+        const mnid = localStorage.getItem('mnid');
+        if (mnid) {
+                setUId(mnid)
+        }
+    }, []);
 
     return (
         <section id="login">

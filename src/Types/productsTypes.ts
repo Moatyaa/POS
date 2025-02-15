@@ -10,6 +10,11 @@ export type  Product = {
     salePrice: number,
     category: ModifyCatTypes
     content: []
+    product:Product;
+    stock: number;
+    quantity: number;
+    product_id: number;
+    service: boolean
 };
 
 export type ProductContextTypes = {

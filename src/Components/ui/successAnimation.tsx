@@ -13,7 +13,7 @@ const LottieAnimation = () => {
     };
 
     return (
-        <div className='absolute top-[20px] left-0'>
+        <div className='absolute -top-[30px] -left-[30px]'>
             <Lottie options={defaultOptions} height={120} width={120} />
         </div>
     );

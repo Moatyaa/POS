@@ -8,7 +8,6 @@ const API_REFRESH= `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh-token`;
 const storedToken = Cookies.get('refreshToken')
 export const userLogin = async (loginData:Credentials)=>{
    try {
-       console.log(loginData)
        const response = await axios.post(API_LOGIN, loginData,{    headers: { 'Content-Type': 'application/json' }})
        return await response.data
    }catch (error) {

@@ -1,5 +1,6 @@
 import React, {Dispatch, SetStateAction} from "react";
 import {ModifyCatTypes} from "@/Types/categoriesTypes";
+import {Product} from "@/Types/productsTypes";
 export type UseToggleReturn = [boolean, () => void]; // Optional: Define return type for better readability
 export type SidebarHeaderProps = {
     isOpen: boolean;
@@ -26,17 +27,14 @@ export type SidebarLinks = {
     title: string;
     icon: string;
     route: string;
-    role : 'User' | 'Admin' | 'manager';
+    role : 'User' | 'Admin' | 'manager' | "Accountant";
     dropDownItems?: DropDownItem[];  // Optional array of dropdown items.
 };
 
 export type CategoriesType = {
     name: string;
-    image: string;
-    quantity: number;
     id: number;
-    color: string, // Text color
-    bgColor:string
+    color: string,
 }
 export type ProductModalProps = {
     modalOpen: boolean; // Boolean to manage modal open state
@@ -101,17 +99,18 @@ export type ShiftModalProps = {
     setBalance: (balance: string) => void;
     setRemainingAmount: (remainingAmount: string) => void;
     errorMessage: string
+
 }
 
 export type CartModalProps = {
     isOpen: boolean;
     // onConfirm: () => void;
-    onCancel: () => void;
+    onCancel: Dispatch<SetStateAction<boolean>>
 }
 
 export type CartContextType = {
-    cartProducts: ProductType[]; // Should be an array of ProductType
-    setCartProducts:  Dispatch<SetStateAction<ProductType[]>> // Setter for cartProducts
+    cartProducts: Product[]; // Should be an array of ProductType
+    setCartProducts:  Dispatch<SetStateAction<Product[]>> // Setter for cartProducts
 };
 
 export type SubLinksHeaderProps = {

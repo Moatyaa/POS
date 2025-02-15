@@ -7,6 +7,7 @@ import SubLinksHeader from "@/Components/SubLinksHeader/SubLinksHeader";
 import clsx from "clsx";
 import { useSettings } from "@/Context/SettingsContext";
 import Cookies from "js-cookie";
+import {useTranslations} from "use-intl";
 
 export type TabResource = {
     name: string;
@@ -18,7 +19,7 @@ export type TabResource = {
 const SettingsPage = () => {
     const { resource } = useParams();
     const userRoles = Cookies.get("role")?.split(',') || [];  // Assuming roles are stored as a comma-separated string
-
+    const t = useTranslations('resources')
     const [activeTab, setActiveTab] = useState<TabResource | undefined>(() => {
         return resources.find((res) => res.resource.toLowerCase() === resource);
     });
@@ -50,7 +51,7 @@ const SettingsPage = () => {
         <div>
             <section id="settings" className="settings">
                 <div>
-                    <SubLinksHeader subHeaderTitle={'Settings'} activeSubLinkTitle={`${activeTab?.name || 'Choose a tab'}`} />
+                    <SubLinksHeader subHeaderTitle={t('Settings')} activeSubLinkTitle={`${activeTab?.name || 'Choose a tab'}`} />
                 </div>
                 <div className="flex gap-2">
                     <div className="settingLeftSide w-[20%]">
@@ -64,7 +65,7 @@ const SettingsPage = () => {
                                     onClick={() => handleTabChange(res)}
                                     className={clsx('subLink', { 'activeSubLink': activeTab?.name === res.name })}
                                 >
-                                    {res.name}
+                                    {t(res.name)}
                                 </div>
                             );
                         })}

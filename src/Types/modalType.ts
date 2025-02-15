@@ -14,6 +14,7 @@ export interface Category {
     name: string;
     description: string;
     color: string;
+    numberOfProductsStock: number;
 }
 
 // Product Type
@@ -22,9 +23,13 @@ export interface Product {
     timestamp: string;
     name: string;
     sku: string;
-    salePrice: number;
+    salePrice: string;
     category_id: number;
     category: Category;
+    product_id: string;
+    stock: number;
+    product: Product
+    service:boolean
 }
 
 // Supplier Type

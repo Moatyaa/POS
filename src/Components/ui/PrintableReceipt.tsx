@@ -1,17 +1,23 @@
-import React, {  useRef } from 'react';
-import  { useReactToPrint } from 'react-to-print';
+import React, {Dispatch, SetStateAction, useRef} from 'react';
+import { useReactToPrint } from 'react-to-print';
+import { useCart } from "@/Context/CartContext";
 
 interface PrintableReceiptProps {
     content: React.ReactNode; // محتوى الطباعة
     pageSize: { width: string; height: string }; // أبعاد الورقة
+    onCancel: Dispatch<SetStateAction<boolean>>
 }
 
-const PrintableReceipt: React.FC<PrintableReceiptProps> = ({ content, pageSize }) => {
+const PrintableReceipt: React.FC<PrintableReceiptProps> = ({ content, pageSize , onCancel  }) => {
     const contentRef = useRef<HTMLDivElement>(null);
-
+    const { setCartProducts } = useCart();
 
     const reactToPrintFn = useReactToPrint({
         contentRef,
+        onAfterPrint: () => {
+            setCartProducts([]);
+            onCancel(false);
+        },
     });
 
     return (
@@ -21,7 +27,7 @@ const PrintableReceipt: React.FC<PrintableReceiptProps> = ({ content, pageSize }
                 className="react-to-print"
                 style={{
                     ...pageSize,
-                    padding: '10px',
+                    padding:"15px",
                     fontFamily: 'Arial, sans-serif',
                     fontSize: '12px',
                     lineHeight: '1.5',
@@ -31,9 +37,11 @@ const PrintableReceipt: React.FC<PrintableReceiptProps> = ({ content, pageSize }
             >
                 {content}
             </div>
-            <div className=' mt-3'>
+            <div className='mt-3'>
                 <button
-                    onClick={() => reactToPrintFn()}
+                    onClick={() => {
+                        reactToPrintFn();
+                    }}
                     className="py-2 w-[100%] px-4 bg-blue-500 text-white rounded-lg"
                 >
                     Print Receipt
